@@ -2,10 +2,12 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // 🔥 THIS FIXES IT
   },
-  max: 5,              // IMPORTANT for Supabase
+
+  max: 5,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
 });
@@ -15,7 +17,7 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  console.error('❌ DB Error', err);
+  console.error('❌ DB Error', err.message);
   process.exit(1);
 });
 
