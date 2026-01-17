@@ -3,12 +3,20 @@ const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // required for Supabase
-  }
+    rejectUnauthorized: false,
+  },
+  max: 5,              // IMPORTANT for Supabase
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
-pool.query('SELECT 1')
-  .then(() => console.log('✅ DB Connected Successfully'))
-  .catch(err => console.error('❌ DB Connection Failed', err));
+pool.on('connect', () => {
+  console.log('✅ DB Connected');
+});
+
+pool.on('error', (err) => {
+  console.error('❌ DB Error', err);
+  process.exit(1);
+});
 
 module.exports = pool;
